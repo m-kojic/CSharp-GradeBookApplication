@@ -14,10 +14,12 @@ namespace GradeBook.GradeBooks
         public string Name { get; set; }
         public List<Student> Students { get; set; }
         public GradeBookType Type { get; set; }
+        public bool IsWeighted { get; set; }
 
-        public BaseGradeBook(string name)
+        public BaseGradeBook(string name, bool weight)
         {
             Name = name;
+            IsWeighted = weight;
             Students = new List<Student>();
         }
 
@@ -107,19 +109,50 @@ namespace GradeBook.GradeBooks
 
         public virtual double GetGPA(char letterGrade, StudentType studentType)
         {
-            switch (letterGrade)
+            bool IsSpecialCondition = IsWeighted &&
+                (studentType == StudentType.Honors || studentType == StudentType.DualEnrolled);
+
+            if (letterGrade == 'A' && IsSpecialCondition)
             {
-                case 'A':
-                    return 4;
-                case 'B':
-                    return 3;
-                case 'C':
-                    return 2;
-                case 'D':
-                    return 1;
-                case 'F':
-                    return 0;
+                return 5;
             }
+            else if (letterGrade == 'B' && IsSpecialCondition)
+            {
+                return 4;
+            }
+            else if (letterGrade == 'C' && IsSpecialCondition)
+            {
+                return 3;
+            }
+            else if (letterGrade == 'D' && IsSpecialCondition)
+            {
+                return 2;
+            }
+            else if (letterGrade == 'F' && IsSpecialCondition)
+            {
+                return 1;
+            }
+            else if (letterGrade == 'A')
+            {
+                return 4;
+            }
+            else if (letterGrade == 'B')
+            {
+                return 3;
+            }
+            else if (letterGrade == 'C')
+            {
+                return 2;
+            }
+            else if (letterGrade == 'D')
+            {
+                return 1;
+            }
+            else if (letterGrade == 'F')
+            {
+                return 0;
+            }
+
             return 0;
         }
 
@@ -264,7 +297,7 @@ namespace GradeBook.GradeBooks
                              from type in assembly.GetTypes()
                              where type.FullName == "GradeBook.GradeBooks.StandardGradeBook"
                              select type).FirstOrDefault();
-            
+
             return JsonConvert.DeserializeObject(json, gradebook);
         }
     }
